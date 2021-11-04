@@ -1,10 +1,20 @@
-const products = require("../../products");
 const Product = require("../../db/models/Product");
+
 
 exports.fetchProduct = async (productId, next) => {
   try {
     const product = await Product.findById(productId);
     return product;
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.productCreate = async (req, res, next) => {
+  try {
+    req.body.image = `http://localhost:8000/${req.file.path}`;
+    const newProduct = await Product.create(req.body);
+    return res.status(201).json(newProduct);
   } catch (error) {
     next(error);
   }
@@ -16,7 +26,15 @@ exports.productListFetch = async (req, res, next) => {
     return res.json(products);
   } catch (error) {
     next(error);
-    // return res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getShops = async (req, res, next) => {
+  try {
+    const shops = await Shop.find();
+    return res.json(shops);
+  } catch (error) {
+  return res.status(500).json({ message: error.message });
   }
 };
 
@@ -24,13 +42,12 @@ exports.productDetailFetch = async (req, res, next) =>
   res.status(200).json(req.product);
 
 
-exports.productCreate = async (req, res, next) => {
+exports.shopCreate = async (req, res, next) => {
   try {
-    req.body.image = `http://localhost:8000/${req.file.path}`;
-    const newProduct = await Product.create(req.body);
-    return res.status(201).json(newProduct);
+    const newShop = await Shop.create(req.body);
+    return res.status(201).json(newShop);
   } catch (error) {
-    next(error);
+    return res.status(500).json({ message: error.message });
   }
 };
 
